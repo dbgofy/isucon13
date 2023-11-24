@@ -160,10 +160,16 @@ func postIconHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to commit: "+err.Error())
 	}
 
+	// user name を取得
+	var userName string
+	if err := dbConn.GetContext(ctx, &userName, "SELECT name FROM users WHERE id = ?", userID); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user name: "+err.Error())
+	}
+
 	const base = "/home/isucon/webapp/public"
 
 	// ファイルとして画像を出力
-	filename := filepath.Join(base, "icons", strconv.FormatInt(userID, 10))
+	filename := filepath.Join(base, "icons", userName)
 	file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to open file "+filename+": "+err.Error())
