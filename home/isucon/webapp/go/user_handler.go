@@ -164,7 +164,13 @@ func postIconHandler(c echo.Context) error {
 
 	// ファイルとして画像を出力
 	filename := filepath.Join(base, "icons", strconv.FormatInt(userID, 10))
-	if err := os.WriteFile(filename, req.Image, 0644); err != nil {
+	file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to open file "+filename+": "+err.Error())
+	}
+	defer file.Close()
+	_, err = file.Write(req.Image)
+	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to write file "+filename+": "+err.Error())
 	}
 
