@@ -97,13 +97,16 @@ func main() {
 		log.Fatalf("failed to select icons: %v\n", err)
 	}
 
+	log.Printf("select: %d icons\n", len(icons))
 	const base = "/home/isucon/webapp/public"
 	for _, icon := range icons {
 		filename := filepath.Join(base, "icons", strconv.FormatInt(icon.UserID, 10))
+		log.Printf("write: %s\n", filename)
 		os.WriteFile(filename, icon.Image, 0644)
 
 		hash := fmt.Sprintf("%x", sha256.Sum256(icon.Image))
 		symlink := filepath.Join(base, "icons_hash", hash)
+		log.Printf("symlink: %s -> %s\n", filename, symlink)
 		os.Symlink(filename, symlink)
 	}
 }
