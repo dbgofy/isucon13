@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -157,6 +159,17 @@ func postIconHandler(c echo.Context) error {
 	if err := tx.Commit(); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to commit: "+err.Error())
 	}
+
+	const base = "/home/isucon/webapp/public"
+
+	// ファイルとして画像を出力
+	filename := filepath.Join(base, "icons", strconv.FormatInt(userID, 10))
+	os.WriteFile(filename, req.Image, 0644)
+
+	// symlink を作る
+	hash := fmt.Sprintf("%x", sha256.Sum256(req.Image))
+	symlink := filepath.Join(base, "icons_hash", hash)
+	os.Symlink(filename, symlink)
 
 	return c.JSON(http.StatusCreated, &PostIconResponse{
 		ID: iconID,
