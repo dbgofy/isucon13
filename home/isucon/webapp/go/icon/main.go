@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -81,8 +82,7 @@ func main() {
 	// DB接続
 	conn, err := connectDB()
 	if err != nil {
-		fmt.Errorf("failed to connect db: %v", err)
-		os.Exit(1)
+		log.Fatalf("failed to connect db: %v\n", err)
 	}
 	defer conn.Close()
 	dbConn = conn
@@ -94,8 +94,7 @@ func main() {
 		Image  []byte `db:"image"`
 	}
 	if err := dbConn.GetContext(ctx, &icons, "SELECT * FROM icons"); err != nil {
-		fmt.Errorf("failed to select icons: %v", err)
-		os.Exit(1)
+		log.Fatalf("failed to select icons: %v\n", err)
 	}
 
 	const base = "/home/isucon/webapp/public"
