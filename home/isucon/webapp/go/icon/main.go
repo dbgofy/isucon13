@@ -93,7 +93,7 @@ func main() {
 		UserID int64  `db:"user_id"`
 		Image  []byte `db:"image"`
 	}
-	if err := dbConn.GetContext(ctx, &icons, "SELECT * FROM icons"); err != nil {
+	if err := dbConn.SelectContext(ctx, &icons, "SELECT * FROM icons"); err != nil {
 		log.Fatalf("failed to select icons: %v\n", err)
 	}
 
