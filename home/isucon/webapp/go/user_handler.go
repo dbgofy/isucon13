@@ -164,12 +164,16 @@ func postIconHandler(c echo.Context) error {
 
 	// ファイルとして画像を出力
 	filename := filepath.Join(base, "icons", strconv.FormatInt(userID, 10))
-	os.WriteFile(filename, req.Image, 0644)
+	if err := os.WriteFile(filename, req.Image, 0644); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to write file "+filename+": "+err.Error())
+	}
 
 	// symlink を作る
 	hash := fmt.Sprintf("%x", sha256.Sum256(req.Image))
 	symlink := filepath.Join(base, "icons_hash", hash)
-	os.Symlink(filename, symlink)
+	if err := os.Symlink(filename, symlink); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to create symlink "+filename+" -> "+symlink+": "+err.Error())
+	}
 
 	return c.JSON(http.StatusCreated, &PostIconResponse{
 		ID: iconID,
