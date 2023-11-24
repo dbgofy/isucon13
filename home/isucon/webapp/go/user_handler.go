@@ -180,12 +180,14 @@ func postIconHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to write file "+filename+": "+err.Error())
 	}
 
-	// symlink を作る
+	// hash file を作る
 	hash := fmt.Sprintf("%x", sha256.Sum256(req.Image))
-	symlink := filepath.Join(base, "icons_hash", strconv.Quote(hash))
-	if err := os.Symlink(filename, symlink); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to create symlink "+filename+" -> "+symlink+": "+err.Error())
+	hashfilename := filepath.Join(base, "icons_hash", strconv.Quote(hash))
+	hashfile, err := os.OpenFile(hashfilename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to open file "+hashfilename+": "+err.Error())
 	}
+	defer hashfile.Close()
 
 	return c.JSON(http.StatusCreated, &PostIconResponse{
 		ID: iconID,
