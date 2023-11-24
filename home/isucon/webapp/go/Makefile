@@ -47,6 +47,8 @@ deploy:
 	systemctl stop isupipe-go
 	$(MAKE) build
 	systemctl start isupipe-go
+	> /var/log/nginx/access.log
+	> /var/log/mysql/mysql-slow.log
 
 .PHONY: deploy-all
 deploy-all:
