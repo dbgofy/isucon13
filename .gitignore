@@ -71,3 +71,11 @@
 /etc/powerdns/*
 !/etc/powerdns/named.conf
 
+# /etc/powerdns/pdns.conf
+/*
+!/etc
+/etc/*
+!/etc/powerdns
+/etc/powerdns/*
+!/etc/powerdns/pdns.conf
+
