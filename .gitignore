@@ -63,3 +63,11 @@
 /etc/*
 !/etc/hosts
 
+# /etc/powerdns/named.conf
+/*
+!/etc
+/etc/*
+!/etc/powerdns
+/etc/powerdns/*
+!/etc/powerdns/named.conf
+
