@@ -476,6 +476,7 @@ func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel, the
 	}
 
 	var hash string
+	found = false
 	if len(hashMap) > 0 {
 		hash, found = hashMap[userModel.ID]
 	}
