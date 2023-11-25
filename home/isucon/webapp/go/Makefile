@@ -41,3 +41,16 @@ mysqldumpslow.log: /var/log/mysql/mysql-slow.log
 	slackcat -c slowlog -n $@ --comment "hostname=$(shell hostname) $(shell git log -1)" < $@
 	cp -f $< $<.bak
 	> $<
+
+.PHONY: deploy
+deploy:
+	systemctl stop isupipe-go
+	$(MAKE) build
+	systemctl start isupipe-go
+
+.PHONY: deploy-all
+deploy-all:
+	# go の PATH が通っていなくて動かないのでいったんコメントアウトする
+	#ssh root@private-1 'cd /home/isucon/webapp/go; make deploy'
+	#ssh root@private-2 'cd /home/isucon/webapp/go; make deploy'
+	#ssh root@private-3 'cd /home/isucon/webapp/go; make deploy'
