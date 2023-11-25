@@ -107,16 +107,25 @@ duration_index = 10
 # You can replace the part of urls which matched to your regular expressions.
 # For overview of regexp syntax: https://golang.org/pkg/regexp/syntax/
 #
-#[[replace]]
-#regexp = '/[0-9]+(/|\s)'
-#replace = '/<num>$1'
-#
-#[[replace]]
-#regexp = '=[0-9]+(&|\s)'
-#replace = '=<num>$1'
-#
-#[[replace]]
-#regexp = '\s+HTTP/[0-9.]+$'
-#replace = ''
+[[replace]]
+regexp = '/api/user/[^/]+/'
+replace = '/api/user/:user_name/'
+
+[[replace]]
+regexp = '/[0-9]+(/|\s)'
+replace = '/:id$1'
+
+[[replace]]
+regexp = '=[0-9]+(&|\s)'
+replace = '=:number$1'
+
+[[replace]]
+regexp = 'tag=(?:[^%]|%[0-9A-Fa-f]{2})+(&|\s)'
+replace = 'tag=:tag_string$1'
+
+
+[[replace]]
+regexp = '\s+HTTP/[0-9.]+$'
+replace = ''
 
 ################################################################################
