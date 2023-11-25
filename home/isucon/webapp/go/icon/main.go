@@ -108,5 +108,9 @@ func main() {
 		symlink := filepath.Join(base, "icons_hash", hash)
 		log.Printf("symlink: %s -> %s\n", filename, symlink)
 		os.Symlink(filename, symlink)
+
+		if _, err = dbConn.ExecContext(ctx, "UPDATE icons SET hash = ? WHERE id = ?", hash, icon.ID); err != nil {
+			log.Fatalf("failed to update hash: %v\n", err)
+		}
 	}
 }
