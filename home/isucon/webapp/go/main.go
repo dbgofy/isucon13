@@ -14,7 +14,6 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/labstack/echo-contrib/pprof"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
@@ -127,9 +126,8 @@ func initializeHandler(c echo.Context) error {
 
 func main() {
 	e := echo.New()
-	pprof.Register(e)
-	e.Debug = true
-	e.Logger.SetLevel(echolog.DEBUG)
+	e.Debug = false
+	e.Logger.SetLevel(echolog.ERROR)
 	e.Use(middleware.Logger())
 	cookieStore := sessions.NewCookieStore(secret)
 	cookieStore.Options.Domain = "*.u.isucon.dev"
