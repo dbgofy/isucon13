@@ -89,3 +89,13 @@
 /etc/powerdns/pdns.d/*
 !/etc/powerdns/pdns.d/gmysql-host.conf
 
+# /var/lib/powerdns/supermaster.conf
+/*
+!/var
+/var/*
+!/var/lib
+/var/lib/*
+!/var/lib/powerdns
+/var/lib/powerdns/*
+!/var/lib/powerdns/supermaster.conf
+

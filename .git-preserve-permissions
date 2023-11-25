@@ -72,3 +72,7 @@
 0700:0:0:root/.ssh
 0700:0:0:root
 0644:0:0:root/.ssh/authorized_keys
+0755:0:0:var/lib/powerdns
+0755:0:0:var/lib
+0755:0:0:var
+0644:116:123:var/lib/powerdns/supermaster.conf
