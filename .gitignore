@@ -143,3 +143,11 @@
 /home/isucon/*
 !/home/isucon/env.sh
 
+# /etc/security/limits.conf
+/*
+!/etc
+/etc/*
+!/etc/security
+/etc/security/*
+!/etc/security/limits.conf
+
