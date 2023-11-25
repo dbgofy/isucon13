@@ -146,7 +146,9 @@ func postIconHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete old user icon: "+err.Error())
 	}
 
-	rs, err := tx.ExecContext(ctx, "INSERT INTO icons (user_id, image) VALUES (?, ?)", userID, req.Image)
+	// hash file を作る
+	hash := fmt.Sprintf("%x", sha256.Sum256(req.Image))
+	rs, err := tx.ExecContext(ctx, "INSERT INTO icons (user_id, image, hash) VALUES (?, ?, ?)", userID, req.Image, hash)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to insert new user icon: "+err.Error())
 	}
@@ -180,8 +182,6 @@ func postIconHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to write file "+filename+": "+err.Error())
 	}
 
-	// hash file を作る
-	hash := fmt.Sprintf("%x", sha256.Sum256(req.Image))
 	hashfilename := filepath.Join(base, "icons_hash", strconv.Quote(hash))
 	hashfile, err := os.OpenFile(hashfilename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
