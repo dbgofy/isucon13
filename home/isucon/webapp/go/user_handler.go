@@ -426,7 +426,11 @@ func verifyUserSession(c echo.Context) error {
 
 func createThemeModelMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map[int64]ThemeModel, error) {
 	themeModels := []ThemeModel{}
-	if err := tx.SelectContext(ctx, &themeModels, "SELECT * FROM themes WHERE user_id IN (?)", userIDs); err != nil {
+	query, params, err := sqlx.In("SELECT * FROM themes WHERE user_id IN (?)", userIDs)
+	if err != nil {
+		return nil, err
+	}
+	if err := tx.SelectContext(ctx, &themeModels, query, params...); err != nil {
 		return nil, err
 	}
 
@@ -439,11 +443,15 @@ func createThemeModelMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map
 }
 
 func createHashMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map[int64]string, error) {
+	query, params, err := sqlx.In("SELECT user_id, hash FROM icons WHERE user_id IN (?)", userIDs)
+	if err != nil {
+		return nil, err
+	}
 	var hashes []struct {
 		UserID int64  `db:"user_id"`
 		Hash   string `db:"hash"`
 	}
-	if err := tx.SelectContext(ctx, &hashes, "SELECT user_id, hash FROM icons WHERE user_id IN (?)", userIDs); err != nil {
+	if err := tx.SelectContext(ctx, &hashes, query, params...); err != nil {
 		return nil, err
 	}
 
