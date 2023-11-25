@@ -234,8 +234,8 @@ func getLivestreamStatisticsHandler(c echo.Context) error {
 	spew.Dump(ranking)
 
 	var rank int64 = 1
-	for i := len(ranking) - 1; i >= 0; i-- {
-		entry := ranking[i]
+	for _, v := range ranking {
+		entry := v
 		if entry.LivestreamID == livestreamID {
 			break
 		}
