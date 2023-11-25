@@ -176,7 +176,7 @@ func postIconHandler(c echo.Context) error {
 
 	// symlink を作る
 	hash := fmt.Sprintf("%x", sha256.Sum256(req.Image))
-	symlink := filepath.Join(base, "icons_hash", hash)
+	symlink := strconv.Quote(filepath.Join(base, "icons_hash", hash))
 	if err := os.Symlink(filename, symlink); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to create symlink "+filename+" -> "+symlink+": "+err.Error())
 	}
