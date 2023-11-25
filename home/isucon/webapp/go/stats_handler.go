@@ -221,7 +221,7 @@ func getLivestreamStatisticsHandler(c echo.Context) error {
 	// ランク算出
 	var ranking LivestreamRanking
 
-	if err = tx.SelectContext(ctx, &ranking, "SELECT IFNULL(r.c, 0) + IFNULL(lc.c, 0) as score, IFNULL(r.livestream_id, lc.livestream_id) as livestream_id FROM (SELECT livestream_id, count(1) as c FROM reactions group by livestream_id) as r CROSS JOIN (SELECT livestream_id, count(1) as c FROM livecomments WHERE tip IS NOT NULL GROUP BY livestream_id) as lc on r.livestream_id = lc.livestream_id ORDER BY score DESC, livestream_id DESC"); err != nil {
+	if err = tx.SelectContext(ctx, &ranking, "SELECT IFNULL(r.c, 0) + IFNULL(lc.tip_sum, 0) as score, IFNULL(r.livestream_id, lc.livestream_id) as livestream_id FROM (SELECT livestream_id, count(1) as c FROM reactions group by livestream_id) as r CROSS JOIN (SELECT livestream_id, SUM(tip) as tip_sum FROM livecomments WHERE tip IS NOT NULL GROUP BY livestream_id) as lc on r.livestream_id = lc.livestream_id ORDER BY score DESC, livestream_id DESC"); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to count reactions: "+err.Error())
 	}
 
