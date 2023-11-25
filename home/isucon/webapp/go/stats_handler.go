@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"github.com/davecgh/go-spew/spew"
 	"net/http"
 	"sort"
 	"strconv"
@@ -230,8 +229,6 @@ func getLivestreamStatisticsHandler(c echo.Context) error {
 		"ORDER BY score DESC, livestream_id DESC"); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to count reactions: "+err.Error())
 	}
-
-	spew.Dump(ranking)
 
 	var rank int64 = 1
 	for _, v := range ranking {
