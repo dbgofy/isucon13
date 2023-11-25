@@ -15,3 +15,5 @@ ALTER TABLE `reservation_slots` ADD INDEX `IX_reservation_slots_start_at_end_at`
 ALTER TABLE `ng_words` ADD INDEX `IX_ng_words_user_id_livestream_id` (`user_id`, `livestream_id`);
 
 ALTER TABLE `icons` ADD COLUMN `hash` VARCHAR(255) NOT NULL AFTER `id`;
+
+ALTER TABLE `icons` ADD INDEX `IX_icons_user_id` (`user_id`);
