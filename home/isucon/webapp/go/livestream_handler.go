@@ -158,7 +158,7 @@ func reserveLivestreamHandler(c echo.Context) error {
 		}
 	}
 
-	livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModel, nil)
+	livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModel, nil, nil, nil)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill livestream: "+err.Error())
 	}
@@ -229,9 +229,17 @@ func searchLivestreamsHandler(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user models: "+err.Error())
 	}
+	themeModelMap, err := createThemeModelMap(ctx, tx, userIDs)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createThemeModelMap: "+err.Error())
+	}
+	hashMap, err := createHashMap(ctx, tx, userIDs)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createHashMap: "+err.Error())
+	}
 	livestreams := make([]Livestream, len(livestreamModels))
 	for i := range livestreamModels {
-		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i], userModelsMap)
+		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i], userModelsMap, themeModelMap, hashMap)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill livestream: "+err.Error())
 		}
@@ -274,9 +282,17 @@ func getMyLivestreamsHandler(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user models: "+err.Error())
 	}
+	themeModelMap, err := createThemeModelMap(ctx, tx, userIDs)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createThemeModelMap: "+err.Error())
+	}
+	hashMap, err := createHashMap(ctx, tx, userIDs)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createHashMap: "+err.Error())
+	}
 	livestreams := make([]Livestream, len(livestreamModels))
 	for i := range livestreamModels {
-		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i], userModelsMap)
+		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i], userModelsMap, themeModelMap, hashMap)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill livestream: "+err.Error())
 		}
@@ -325,9 +341,17 @@ func getUserLivestreamsHandler(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user models: "+err.Error())
 	}
+	themeModelMap, err := createThemeModelMap(ctx, tx, userIDs)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createThemeModelMap: "+err.Error())
+	}
+	hashMap, err := createHashMap(ctx, tx, userIDs)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createHashMap: "+err.Error())
+	}
 	livestreams := make([]Livestream, len(livestreamModels))
 	for i := range livestreamModels {
-		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i], userModelsMap)
+		livestream, err := fillLivestreamResponse(ctx, tx, *livestreamModels[i], userModelsMap, themeModelMap, hashMap)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill livestream: "+err.Error())
 		}
@@ -443,7 +467,7 @@ func getLivestreamHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livestream: "+err.Error())
 	}
 
-	livestream, err := fillLivestreamResponse(ctx, tx, livestreamModel, nil)
+	livestream, err := fillLivestreamResponse(ctx, tx, livestreamModel, nil, nil, nil)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill livestream: "+err.Error())
 	}
@@ -524,7 +548,7 @@ func createUserModelsMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map
 	return userModelsMap, nil
 }
 
-func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel LivestreamModel, userModelMap map[int64]UserModel) (Livestream, error) {
+func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel LivestreamModel, userModelMap map[int64]UserModel, themeModelMap map[int64]ThemeModel, hashMap map[int64]string) (Livestream, error) {
 	ownerModel := UserModel{}
 	var found bool
 	if len(userModelMap) > 0 {
@@ -535,7 +559,7 @@ func fillLivestreamResponse(ctx context.Context, tx *sqlx.Tx, livestreamModel Li
 			return Livestream{}, err
 		}
 	}
-	owner, err := fillUserResponse(ctx, tx, ownerModel)
+	owner, err := fillUserResponse(ctx, tx, ownerModel, themeModelMap, hashMap)
 	if err != nil {
 		return Livestream{}, err
 	}

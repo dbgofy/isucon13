@@ -109,13 +109,19 @@ func getLivecommentsHandler(c echo.Context) error {
 	}
 	userModels, err := createUserModelsMap(ctx, tx, userIDs)
 	if err != nil {
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createUserModelsMap: "+err.Error())
-		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createUserModelsMap: "+err.Error())
+	}
+	themeModelMap, err := createThemeModelMap(ctx, tx, userIDs)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createThemeModelMap: "+err.Error())
+	}
+	hashMap, err := createHashMap(ctx, tx, userIDs)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createHashMap: "+err.Error())
 	}
 	livecomments := make([]Livecomment, len(livecommentModels))
 	for i := range livecommentModels {
-		livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModels[i], userModels)
+		livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModels[i], userModels, themeModelMap, hashMap)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil livecomments: "+err.Error())
 		}
@@ -239,7 +245,7 @@ func postLivecommentHandler(c echo.Context) error {
 	}
 	livecommentModel.ID = livecommentID
 
-	livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModel, nil)
+	livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModel, nil, nil, nil)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill livecomment: "+err.Error())
 	}
@@ -398,7 +404,7 @@ func moderateHandler(c echo.Context) error {
 	})
 }
 
-func fillLivecommentResponse(ctx context.Context, tx *sqlx.Tx, livecommentModel LivecommentModel, userModelMap map[int64]UserModel) (Livecomment, error) {
+func fillLivecommentResponse(ctx context.Context, tx *sqlx.Tx, livecommentModel LivecommentModel, userModelMap map[int64]UserModel, themeModelMap map[int64]ThemeModel, hashMap map[int64]string) (Livecomment, error) {
 	commentOwnerModel := UserModel{}
 	var found bool
 	if len(userModelMap) > 0 {
@@ -409,7 +415,7 @@ func fillLivecommentResponse(ctx context.Context, tx *sqlx.Tx, livecommentModel 
 			return Livecomment{}, err
 		}
 	}
-	commentOwner, err := fillUserResponse(ctx, tx, commentOwnerModel)
+	commentOwner, err := fillUserResponse(ctx, tx, commentOwnerModel, themeModelMap, hashMap)
 	if err != nil {
 		return Livecomment{}, err
 	}
@@ -418,7 +424,7 @@ func fillLivecommentResponse(ctx context.Context, tx *sqlx.Tx, livecommentModel 
 	if err := tx.GetContext(ctx, &livestreamModel, "SELECT * FROM livestreams WHERE id = ?", livecommentModel.LivestreamID); err != nil {
 		return Livecomment{}, err
 	}
-	livestream, err := fillLivestreamResponse(ctx, tx, livestreamModel, userModelMap)
+	livestream, err := fillLivestreamResponse(ctx, tx, livestreamModel, userModelMap, themeModelMap, hashMap)
 	if err != nil {
 		return Livecomment{}, err
 	}
@@ -440,7 +446,7 @@ func fillLivecommentReportResponse(ctx context.Context, tx *sqlx.Tx, reportModel
 	if err := tx.GetContext(ctx, &reporterModel, "SELECT * FROM users WHERE id = ?", reportModel.UserID); err != nil {
 		return LivecommentReport{}, err
 	}
-	reporter, err := fillUserResponse(ctx, tx, reporterModel)
+	reporter, err := fillUserResponse(ctx, tx, reporterModel, nil, nil)
 	if err != nil {
 		return LivecommentReport{}, err
 	}
@@ -450,7 +456,7 @@ func fillLivecommentReportResponse(ctx context.Context, tx *sqlx.Tx, reportModel
 		return LivecommentReport{}, err
 	}
 
-	livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModel, nil) // TODO 多分直せる
+	livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModel, nil, nil, nil) // TODO 多分直せる
 	if err != nil {
 		return LivecommentReport{}, err
 	}

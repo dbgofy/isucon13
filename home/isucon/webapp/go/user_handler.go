@@ -221,7 +221,7 @@ func getMeHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user: "+err.Error())
 	}
 
-	user, err := fillUserResponse(ctx, tx, userModel)
+	user, err := fillUserResponse(ctx, tx, userModel, nil, nil)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill user: "+err.Error())
 	}
@@ -286,7 +286,7 @@ func registerHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to insert user theme: "+err.Error())
 	}
 
-	user, err := fillUserResponse(ctx, tx, userModel)
+	user, err := fillUserResponse(ctx, tx, userModel, nil, nil)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill user: "+err.Error())
 	}
@@ -388,7 +388,7 @@ func getUserHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user: "+err.Error())
 	}
 
-	user, err := fillUserResponse(ctx, tx, userModel)
+	user, err := fillUserResponse(ctx, tx, userModel, nil, nil)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fill user: "+err.Error())
 	}
@@ -424,18 +424,60 @@ func verifyUserSession(c echo.Context) error {
 	return nil
 }
 
-func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel) (User, error) {
+func createThemeModelMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map[int64]ThemeModel, error) {
+	themeModels := []ThemeModel{}
+	if err := tx.SelectContext(ctx, &themeModels, "SELECT * FROM themes WHERE user_id IN (?)", userIDs); err != nil {
+		return nil, err
+	}
+
+	themeModelMap := map[int64]ThemeModel{}
+	for _, themeModel := range themeModels {
+		themeModelMap[themeModel.UserID] = themeModel
+	}
+
+	return themeModelMap, nil
+}
+
+func createHashMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map[int64]string, error) {
+	var hashes []struct {
+		UserID int64  `db:"user_id"`
+		Hash   string `db:"hash"`
+	}
+	if err := tx.SelectContext(ctx, &hashes, "SELECT user_id, hash FROM icons WHERE user_id IN (?)", userIDs); err != nil {
+		return nil, err
+	}
+
+	hashMap := map[int64]string{}
+	for _, hash := range hashes {
+		hashMap[hash.UserID] = hash.Hash
+	}
+
+	return hashMap, nil
+}
+
+func fillUserResponse(ctx context.Context, tx *sqlx.Tx, userModel UserModel, themeModelMap map[int64]ThemeModel, hashMap map[int64]string) (User, error) {
+	var found bool
 	themeModel := ThemeModel{}
-	if err := tx.GetContext(ctx, &themeModel, "SELECT * FROM themes WHERE user_id = ?", userModel.ID); err != nil {
-		return User{}, err
+	if len(themeModelMap) > 0 {
+		themeModel, found = themeModelMap[userModel.ID]
+	}
+	if !found {
+		if err := tx.GetContext(ctx, &themeModel, "SELECT * FROM themes WHERE user_id = ?", userModel.ID); err != nil {
+			return User{}, err
+		}
 	}
 
 	var hash string
-	if err := tx.GetContext(ctx, &hash, "SELECT hash FROM icons WHERE user_id = ?", userModel.ID); err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			return User{}, err
-		} else {
-			hash = "d9f8294e9d895f81ce62e73dc7d5dff862a4fa40bd4e0fecf53f7526a8edcac0" // no image
+	if len(hashMap) > 0 {
+		hash, found = hashMap[userModel.ID]
+	}
+	if !found {
+		if err := tx.GetContext(ctx, &hash, "SELECT hash FROM icons WHERE user_id = ?", userModel.ID); err != nil {
+			if !errors.Is(err, sql.ErrNoRows) {
+				return User{}, err
+			} else {
+				hash = "d9f8294e9d895f81ce62e73dc7d5dff862a4fa40bd4e0fecf53f7526a8edcac0" // no image
+			}
 		}
 	}
 
