@@ -79,3 +79,13 @@
 /etc/powerdns/*
 !/etc/powerdns/pdns.conf
 
+# /etc/powerdns/pdns.d/gmysql-host.conf
+/*
+!/etc
+/etc/*
+!/etc/powerdns
+/etc/powerdns/*
+!/etc/powerdns/pdns.d
+/etc/powerdns/pdns.d/*
+!/etc/powerdns/pdns.d/gmysql-host.conf
+
