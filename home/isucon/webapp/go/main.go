@@ -113,6 +113,12 @@ func initializeHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to initialize: "+err.Error())
 	}
 
+	os.RemoveAll("/home/isucon/webapp/public/icons")
+	os.Mkdir("/home/isucon/webapp/public/icons", 0777)
+
+	os.RemoveAll("/home/isucon/webapp/public/icons_hash")
+	os.Mkdir("/home/isucon/webapp/public/icons_hash", 0777)
+
 	c.Request().Header.Add("Content-Type", "application/json;charset=utf-8")
 	return c.JSON(http.StatusOK, InitializeResponse{
 		Language: "golang",
