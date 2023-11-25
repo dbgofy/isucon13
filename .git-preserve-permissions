@@ -68,7 +68,8 @@
 0755:1100:1100:home/isucon/webapp/pdns
 0755:1100:1100:home/isucon/webapp/pdns/init_zone.sh
 0644:1100:1100:home/isucon/webapp/pdns/named.conf
-0644:1100:1100:home/isucon/webapp/pdns/u.isucon.dev.zone
+0644:0:0:home/isucon/webapp/pdns/u.isucon.dev.zone
+0644:0:0:home/isucon/webapp/pdns/u.isucon.dev.zone.template
 0755:1100:1100:home/isucon/webapp/public
 0644:1100:1100:home/isucon/webapp/public/NoImage.jpg
 0755:1100:1100:home/isucon/webapp/sql
