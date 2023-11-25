@@ -449,7 +449,8 @@ func fillLivecommentReportResponse(ctx context.Context, tx *sqlx.Tx, reportModel
 	if err := tx.GetContext(ctx, &livecommentModel, "SELECT * FROM livecomments WHERE id = ?", reportModel.LivecommentID); err != nil {
 		return LivecommentReport{}, err
 	}
-	livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModel)
+
+	livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModel, nil) // TODO 多分直せる
 	if err != nil {
 		return LivecommentReport{}, err
 	}
