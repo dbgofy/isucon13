@@ -26,3 +26,14 @@ docker_image: clean build
 .PHONY: clean
 clean:
 	$(DOCKER_RMI) -f $(TAG)
+	
+.PHONY: logrotate
+logrotate: kataribe.log mysqldumpslow.log
+
+kataribe.log: /var/log/nginx/access.log
+
+mysqldumpslow.log: /var/log/mysql/mysql-slow.log
+	mysqldumpslow -s t $< > $@
+	slackcat -c slowlog -n $@ --comment "hostname=$(shell hostname) $(shell git log -1)" < $@
+	cp -f $< $<.bak
+	> $<
