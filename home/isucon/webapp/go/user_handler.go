@@ -425,6 +425,9 @@ func verifyUserSession(c echo.Context) error {
 }
 
 func createThemeModelMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map[int64]ThemeModel, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
 	themeModels := []ThemeModel{}
 	query, params, err := sqlx.In("SELECT * FROM themes WHERE user_id IN (?)", userIDs)
 	if err != nil {
@@ -443,6 +446,9 @@ func createThemeModelMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map
 }
 
 func createHashMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map[int64]string, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
 	query, params, err := sqlx.In("SELECT user_id, hash FROM icons WHERE user_id IN (?)", userIDs)
 	if err != nil {
 		return nil, err

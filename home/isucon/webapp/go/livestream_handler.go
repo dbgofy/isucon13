@@ -533,6 +533,9 @@ func getLivecommentReportsHandler(c echo.Context) error {
 }
 
 func createUserModelsMap(ctx context.Context, tx *sqlx.Tx, userIDs []int64) (map[int64]UserModel, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
 	query, params, err := sqlx.In("SELECT * FROM users WHERE id IN (?)", userIDs)
 	if err != nil {
 		return nil, err
