@@ -111,3 +111,15 @@
 /home/isucon/webapp/pdns/*
 !/home/isucon/webapp/pdns/init_zone.sh
 
+# /home/isucon/webapp/pdns/named.conf
+/*
+!/home
+/home/*
+!/home/isucon
+/home/isucon/*
+!/home/isucon/webapp
+/home/isucon/webapp/*
+!/home/isucon/webapp/pdns
+/home/isucon/webapp/pdns/*
+!/home/isucon/webapp/pdns/named.conf
+
