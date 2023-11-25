@@ -47,6 +47,7 @@
 0644:0:0:home/isucon/webapp/go/Makefile
 0644:0:0:home/isucon/webapp/go/go.mod
 0644:0:0:home/isucon/webapp/go/go.sum
+0644:0:0:home/isucon/webapp/go/kataribe.toml
 0644:0:0:home/isucon/webapp/go/livecomment_handler.go
 0644:0:0:home/isucon/webapp/go/livestream_handler.go
 0644:0:0:home/isucon/webapp/go/main.go
