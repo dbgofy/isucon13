@@ -45,3 +45,15 @@
 /etc/nginx/sites-enabled/*
 !/etc/nginx/sites-enabled/isupipe.conf
 
+# /home/isucon/webapp/go/kataribe.toml
+/*
+!/home
+/home/*
+!/home/isucon
+/home/isucon/*
+!/home/isucon/webapp
+/home/isucon/webapp/*
+!/home/isucon/webapp/go
+/home/isucon/webapp/go/*
+!/home/isucon/webapp/go/kataribe.toml
+
