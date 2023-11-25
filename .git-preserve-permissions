@@ -8,7 +8,9 @@
 0644:0:0:LICENSE
 0644:0:0:Makefile
 0644:0:0:README.md
+0755:0:0:etc/dnsdist
 0755:0:0:etc
+0640:0:124:etc/dnsdist/dnsdist.conf
 0644:0:0:etc/hosts
 0755:0:0:etc/mysql/mysql.conf.d
 0755:0:0:etc/mysql

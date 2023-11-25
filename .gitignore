@@ -143,3 +143,11 @@
 /home/isucon/*
 !/home/isucon/env.sh
 
+# /etc/dnsdist/dnsdist.conf
+/*
+!/etc
+/etc/*
+!/etc/dnsdist
+/etc/dnsdist/*
+!/etc/dnsdist/dnsdist.conf
+
