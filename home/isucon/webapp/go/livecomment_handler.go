@@ -103,9 +103,19 @@ func getLivecommentsHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get livecomments: "+err.Error())
 	}
 
+	userIDs := make([]int64, 0, len(livecommentModels))
+	for _, v := range livecommentModels {
+		userIDs = append(userIDs, v.UserID)
+	}
+	userModels, err := createUserModelsMap(ctx, tx, userIDs)
+	if err != nil {
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil createUserModelsMap: "+err.Error())
+		}
+	}
 	livecomments := make([]Livecomment, len(livecommentModels))
 	for i := range livecommentModels {
-		livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModels[i])
+		livecomment, err := fillLivecommentResponse(ctx, tx, livecommentModels[i], userModels)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "failed to fil livecomments: "+err.Error())
 		}
@@ -388,10 +398,16 @@ func moderateHandler(c echo.Context) error {
 	})
 }
 
-func fillLivecommentResponse(ctx context.Context, tx *sqlx.Tx, livecommentModel LivecommentModel) (Livecomment, error) {
+func fillLivecommentResponse(ctx context.Context, tx *sqlx.Tx, livecommentModel LivecommentModel, userModelMap map[int64]UserModel) (Livecomment, error) {
 	commentOwnerModel := UserModel{}
-	if err := tx.GetContext(ctx, &commentOwnerModel, "SELECT * FROM users WHERE id = ?", livecommentModel.UserID); err != nil {
-		return Livecomment{}, err
+	var found bool
+	if len(userModelMap) > 0 {
+		commentOwnerModel, found = userModelMap[livecommentModel.UserID]
+	}
+	if !found {
+		if err := tx.GetContext(ctx, &commentOwnerModel, "SELECT * FROM users WHERE id = ?", livecommentModel.UserID); err != nil {
+			return Livecomment{}, err
+		}
 	}
 	commentOwner, err := fillUserResponse(ctx, tx, commentOwnerModel)
 	if err != nil {
@@ -402,7 +418,7 @@ func fillLivecommentResponse(ctx context.Context, tx *sqlx.Tx, livecommentModel 
 	if err := tx.GetContext(ctx, &livestreamModel, "SELECT * FROM livestreams WHERE id = ?", livecommentModel.LivestreamID); err != nil {
 		return Livecomment{}, err
 	}
-	livestream, err := fillLivestreamResponse(ctx, tx, livestreamModel)
+	livestream, err := fillLivestreamResponse(ctx, tx, livestreamModel, userModelMap)
 	if err != nil {
 		return Livecomment{}, err
 	}
