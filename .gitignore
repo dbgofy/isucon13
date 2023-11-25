@@ -35,3 +35,13 @@
 /etc/nginx/*
 !/etc/nginx/nginx.conf
 
+# /etc/nginx/sites-enabled/isupipe.conf
+/*
+!/etc
+/etc/*
+!/etc/nginx
+/etc/nginx/*
+!/etc/nginx/sites-enabled
+/etc/nginx/sites-enabled/*
+!/etc/nginx/sites-enabled/isupipe.conf
+
