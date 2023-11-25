@@ -57,3 +57,9 @@
 /home/isucon/webapp/go/*
 !/home/isucon/webapp/go/kataribe.toml
 
+# /etc/hosts
+/*
+!/etc
+/etc/*
+!/etc/hosts
+
