@@ -135,3 +135,11 @@
 /home/isucon/webapp/pdns/*
 !/home/isucon/webapp/pdns/u.isucon.dev.zone
 
+# /home/isucon/env.sh
+/*
+!/home
+/home/*
+!/home/isucon
+/home/isucon/*
+!/home/isucon/env.sh
+
